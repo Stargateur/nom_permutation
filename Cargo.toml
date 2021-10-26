@@ -1,0 +1,31 @@
+[package]
+name = "nom_permutation"
+description = "permutation conbinator for nom"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.56"
+
+authors = [ "plaskowski.stanislas@gmail.com" ]
+readme = "readme.md"
+keywords = ["nom", "combinator", "permutation"]
+categories = ["nom"]
+
+
+license = "MIT"
+repository = "https://github.com/Stargateur/nom_permutation"
+
+include = [
+  "readme.md",
+  "Cargo.toml",
+  "src/*.rs",
+  "src/**/*.rs"
+]
+
+[features]
+default = ["permutation", "permutation_opt"]
+permutation = []
+permutation_opt = []
+
+[dependencies.nom]
+version = "7"
+default-features = false
