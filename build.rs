@@ -38,7 +38,7 @@ fn magic<W: Write>(mut w: W, n: usize, i: usize) -> Result<W, io::Error> {
     if i < n {
         writeln!(
             w,
-            "{}match self.{i}.parse(input.clone()) {{",
+            "{}match self.{i}(input.clone()) {{",
             NSpace { n: (i + 2) * 2 },
             i = i
         )?;
@@ -58,7 +58,7 @@ fn magic<W: Write>(mut w: W, n: usize, i: usize) -> Result<W, io::Error> {
                 m: i,
             },
             NExludeM {
-                name: "&mut self.",
+                name: "self.",
                 n: n,
                 m: i,
             },
@@ -103,7 +103,7 @@ impl Display for NParser {
         for i in 0..self.n {
             write!(
                 f,
-                "Output{i}, Fn{i}: nom::Parser<Input, Output{i}, Error>,",
+                "Fn{i}: Fn(Input) -> nom::IResult<Input, Output{i}, Error>,",
                 i = i
             )?;
         }
@@ -129,14 +129,15 @@ fn permutation_impl<W: Write>(mut w: W, n: usize) -> Result<W, io::Error> {
     for i in 1..n {
         writeln!(
             w,
-            "impl<Input: Clone, Error: nom::error::ParseError<Input>, {}> Permutation<Input, ({}), Error> for ({}) {{",
+            "impl<Input: Clone, Error: nom::error::ParseError<Input>,{}{}> Permutation<Input, ({}), Error> for ({}) {{",
+            NTuple { name: "Output", n: i },
             NParser { n: i },
             NTuple { name: "Output", n: i },
             NTuple { name: "Fn", n: i },
         )?;
         writeln!(
             w,
-            "  fn permutation(&mut self, input: Input) -> nom::IResult<Input, ({}), Error> {{",
+            "  fn permutation(self, input: Input) -> nom::IResult<Input, ({}), Error> {{",
             NTuple {
                 name: "Output",
                 n: i
@@ -160,7 +161,7 @@ fn main() -> Result<(), io::Error> {
         .truncate(true)
         .open(dest_path)?;
 
-    permutation_impl(BufWriter::new(file), 8)?;
+    permutation_impl(BufWriter::new(file), 3)?;
     println!("cargo:rerun-if-changed=build.rs");
 
     Ok(())

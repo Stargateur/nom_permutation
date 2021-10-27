@@ -7,7 +7,7 @@ use crate::nom::{error::ParseError, IResult as ParserResult};
 /// This trait is implemented for tuples of up to 21 elements
 pub trait Permutation<I, O, E> {
     /// Tries to apply all parsers in the tuple in various orders until all of them succeed
-    fn permutation(&mut self, input: I) -> ParserResult<I, O, E>;
+    fn permutation(self, input: I) -> ParserResult<I, O, E>;
 }
 
 /// Applies a list of parsers in any order.
@@ -56,13 +56,13 @@ pub trait Permutation<I, O, E> {
 /// ```
 ///
 pub fn permutation<I: Clone, O, E: ParseError<I>, List: Permutation<I, O, E>>(
-    mut l: List,
-) -> impl FnMut(I) -> ParserResult<I, O, E> {
+    l: List,
+) -> impl FnOnce(I) -> ParserResult<I, O, E> {
     move |i: I| l.permutation(i)
 }
 
 impl<Input: Clone, Error: nom::error::ParseError<Input>> Permutation<Input, (), Error> for () {
-    fn permutation(&mut self, input: Input) -> nom::IResult<Input, (), Error> {
+    fn permutation(self, input: Input) -> nom::IResult<Input, (), Error> {
         Ok((input, ()))
     }
 }
