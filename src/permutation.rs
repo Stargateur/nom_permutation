@@ -44,8 +44,8 @@ pub trait Permutation<I, O, E> {
 /// tuple of the parser results.
 ///
 /// ```rust
-/// # use nom::{Err,error::{Error, ErrorKind}, Needed, IResult};
-/// use nom::character::complete::{alpha1, digit1};
+/// # use nom_permutation::nom::{Err,error::{Error, ErrorKind}, Needed, IResult};
+/// use nom_permutation::nom::character::complete::{alpha1, digit1};
 /// use nom_permutation::permutation;
 /// # fn main() {
 /// fn parser(input: &str) -> IResult<&str, (&str, &str)> {
@@ -66,8 +66,8 @@ pub trait Permutation<I, O, E> {
 /// The parsers are applied greedily: if there are multiple unapplied parsers
 /// that could parse the next slice of input, the first one is used.
 /// ```rust
-/// # use nom::{Err, error::{Error, ErrorKind}, IResult};
-/// use nom::character::complete::{anychar, char};
+/// # use nom_permutation::nom::{Err, error::{Error, ErrorKind}, IResult};
+/// use nom_permutation::nom::character::complete::{anychar, char};
 /// use nom_permutation::permutation;
 ///
 /// fn parser(input: &str) -> IResult<&str, (char, char)> {

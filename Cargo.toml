@@ -8,8 +8,7 @@ rust-version = "1.56"
 authors = [ "plaskowski.stanislas@gmail.com" ]
 readme = "readme.md"
 keywords = ["nom", "combinator", "permutation"]
-categories = ["nom"]
-
+categories = ["parsing"]
 
 license = "MIT"
 repository = "https://github.com/Stargateur/nom_permutation"
