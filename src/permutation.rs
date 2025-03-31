@@ -1,8 +1,13 @@
 //! Choice combinators
 
 use crate::nom::{
-    error::{ErrorKind as ParserKind, ParseError},
-    Err as OutCome, IResult as ParserResult, Parser,
+  Err as OutCome,
+  IResult as ParserResult,
+  Parser,
+  error::{
+    ErrorKind as ParserKind,
+    ParseError,
+  },
 };
 
 macro_rules! succ (
@@ -33,8 +38,9 @@ macro_rules! succ (
 ///
 /// This trait is implemented for tuples of up to 21 elements
 pub trait Permutation<I, O, E> {
-    /// Tries to apply all parsers in the tuple in various orders until all of them succeed
-    fn permutation(&mut self, input: I) -> ParserResult<I, O, E>;
+  /// Tries to apply all parsers in the tuple in various orders until all of
+  /// them succeed
+  fn permutation(&mut self, input: I) -> ParserResult<I, O, E>;
 }
 
 /// Applies a list of parsers in any order.
@@ -45,8 +51,13 @@ pub trait Permutation<I, O, E> {
 ///
 /// ```rust
 /// # use nom_permutation::nom::{Err,error::{Error, ErrorKind}, Needed, IResult};
-/// use nom_permutation::nom::character::complete::{alpha1, digit1};
-/// use nom_permutation::permutation;
+/// use nom_permutation::{
+///   nom::character::complete::{
+///     alpha1,
+///     digit1,
+///   },
+///   permutation,
+/// };
 /// # fn main() {
 /// fn parser(input: &str) -> IResult<&str, (&str, &str)> {
 ///   permutation((alpha1, digit1))(input)
@@ -59,7 +70,10 @@ pub trait Permutation<I, O, E> {
 /// assert_eq!(parser("123abc"), Ok(("", ("abc", "123"))));
 ///
 /// // it will fail if one of the parsers failed
-/// assert_eq!(parser("abc;"), Err(Err::Error(Error::new(";", ErrorKind::Digit))));
+/// assert_eq!(
+///   parser("abc;"),
+///   Err(Err::Error(Error::new(";", ErrorKind::Digit)))
+/// );
 /// # }
 /// ```
 ///
@@ -67,8 +81,13 @@ pub trait Permutation<I, O, E> {
 /// that could parse the next slice of input, the first one is used.
 /// ```rust
 /// # use nom_permutation::nom::{Err, error::{Error, ErrorKind}, IResult};
-/// use nom_permutation::nom::character::complete::{anychar, char};
-/// use nom_permutation::permutation;
+/// use nom_permutation::{
+///   nom::character::complete::{
+///     anychar,
+///     char,
+///   },
+///   permutation,
+/// };
 ///
 /// fn parser(input: &str) -> IResult<&str, (char, char)> {
 ///   permutation((anychar, char('a')))(input)
@@ -79,13 +98,15 @@ pub trait Permutation<I, O, E> {
 ///
 /// // anychar parses 'a', then char('a') fails on 'b',
 /// // even though char('a') followed by anychar would succeed
-/// assert_eq!(parser("ab"), Err(Err::Error(Error::new("b", ErrorKind::Char))));
+/// assert_eq!(
+///   parser("ab"),
+///   Err(Err::Error(Error::new("b", ErrorKind::Char)))
+/// );
 /// ```
-///
 pub fn permutation<I: Clone, O, E: ParseError<I>, List: Permutation<I, O, E>>(
-    mut l: List,
+  mut l: List,
 ) -> impl FnMut(I) -> ParserResult<I, O, E> {
-    move |i: I| l.permutation(i)
+  move |i: I| l.permutation(i)
 }
 
 macro_rules! permutation_trait(
@@ -112,7 +133,7 @@ macro_rules! permutation_trait_impl(
     ($($name:ident $ty:ident $item:ident),+) => (
       impl<
         Input: Clone, $($ty),+ , Error: ParseError<Input>,
-        $($name: Parser<Input, $ty, Error>),+
+        $($name: Parser<Input, Output=$ty, Error=Error>),+
       > Permutation<Input, ( $($ty),+ ), Error> for ( $($name),+ ) {
 
         fn permutation(&mut self, mut input: Input) -> ParserResult<Input, ( $($ty),+ ), Error> {

@@ -1,25 +1,36 @@
 //! Choice combinators
 
-use crate::nom::{error::ParseError, Err as OutCome, IResult as ParserResult, Parser};
+use crate::nom::{
+  Err as OutCome,
+  IResult as ParserResult,
+  Parser,
+  error::ParseError,
+};
 
 /// Helper trait for the [permutation_opt()] combinator.
 ///
 /// This trait is implemented for tuples of up to 21 elements
 pub trait PermutationOpt<I, O, E> {
-    /// Tries to apply all parsers in the tuple in various orders until all of them succeed or no one succeed anymore
-    fn permutation_opt(&mut self, input: I) -> ParserResult<I, O, E>;
+  /// Tries to apply all parsers in the tuple in various orders until all of
+  /// them succeed or no one succeed anymore
+  fn permutation_opt(&mut self, input: I) -> ParserResult<I, O, E>;
 }
 
 /// Applies a list of parsers in any order.
 ///
-/// Permutation Optional will always succeed unless a parser return an unrecoverable error
-/// It takes as argument a tuple of parsers, and returns a
+/// Permutation Optional will always succeed unless a parser return an
+/// unrecoverable error It takes as argument a tuple of parsers, and returns a
 /// tuple of the parser optional results.
 ///
 /// ```rust
 /// # use nom_permutation::nom::{Err,error::{Error, ErrorKind}, Needed, IResult};
-/// use nom_permutation::nom::character::complete::{alpha1, digit1};
-/// use nom_permutation::permutation_opt;
+/// use nom_permutation::{
+///   nom::character::complete::{
+///     alpha1,
+///     digit1,
+///   },
+///   permutation_opt,
+/// };
 /// # fn main() {
 /// fn parser(input: &str) -> IResult<&str, (Option<&str>, Option<&str>)> {
 ///   permutation_opt((alpha1, digit1))(input)
@@ -43,8 +54,13 @@ pub trait PermutationOpt<I, O, E> {
 /// that could parse the next slice of input, the first one is used.
 /// ```rust
 /// # use nom_permutation::nom::{Err, error::{Error, ErrorKind}, IResult};
-/// use nom_permutation::nom::character::complete::{anychar, char};
-/// use nom_permutation::permutation_opt;
+/// use nom_permutation::{
+///   nom::character::complete::{
+///     anychar,
+///     char,
+///   },
+///   permutation_opt,
+/// };
 ///
 /// fn parser(input: &str) -> IResult<&str, (Option<char>, Option<char>)> {
 ///   permutation_opt((anychar, char('a')))(input)
@@ -57,11 +73,10 @@ pub trait PermutationOpt<I, O, E> {
 /// // even though char('a') followed by anychar would succeed
 /// assert_eq!(parser("ab"), Ok(("b", (Some('a'), None))));
 /// ```
-///
 pub fn permutation_opt<I: Clone, O, E: ParseError<I>, List: PermutationOpt<I, O, E>>(
-    mut l: List,
+  mut l: List,
 ) -> impl FnMut(I) -> ParserResult<I, O, E> {
-    move |i: I| l.permutation_opt(i)
+  move |i: I| l.permutation_opt(i)
 }
 
 macro_rules! permutation_opt_trait(
@@ -88,7 +103,7 @@ macro_rules! permutation_opt_trait_impl(
     ($($name:ident $ty:ident $item:ident),+) => (
       impl<
         Input: Clone, $($ty),+ , Error: ParseError<Input>,
-        $($name: Parser<Input, $ty, Error>),+
+        $($name: Parser<Input, Output=$ty, Error=Error>),+
       > PermutationOpt<Input, ( $(Option<$ty>),+ ), Error> for ( $($name),+ ) {
 
         fn permutation_opt(&mut self, mut input: Input) -> ParserResult<Input, ( $(Option<$ty>),+ ), Error> {

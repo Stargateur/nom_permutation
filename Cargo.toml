@@ -1,9 +1,9 @@
 [package]
 name = "nom_permutation"
 description = "permutation conbinator for nom"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.65.0"
 
 authors = [ "plaskowski.stanislas@gmail.com" ]
 readme = "readme.md"
@@ -26,5 +26,5 @@ permutation = []
 permutation_opt = []
 
 [dependencies.nom]
-version = "7"
+version = "8"
 default-features = false
